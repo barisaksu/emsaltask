@@ -95,7 +95,7 @@ watch(message, (newValue) => {
                         </div>
                         <div>
                             <!-- Yenile Butonu -->
-                            <button class="border border-gray-100 px-2 rounded-sm">Refresh</button>
+                            <button @click="getMessages" class="border border-gray-100 px-2 rounded-sm">Refresh</button>
                         </div>
                     </div>
                     <div v-if="!selectedUserId" class="flex justify-center items-center my-auto">
