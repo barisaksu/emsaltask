@@ -9,7 +9,6 @@ import MessageContainer from "@/Components/MessageContainer.vue";
 const {props} = usePage();
 defineProps({
     users: Object,
-    echo: Object,
 });
 
 const currentUserId = ref(props.auth.user.id);

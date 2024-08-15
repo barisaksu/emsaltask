@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted, ref, watch} from "vue";
+import {ref, watch} from "vue";
 import axios from "axios";
 import {useChatMessages} from "@/Composables/useChatMessages";
 
@@ -51,7 +51,7 @@ watch(() => message.value, (newValue) => {
     isSendDisabled.value = newValue.length < 10;
 });
 
-watch(() => messages.value, () => {  // messages.value kullanarak reaktif değeri izliyoruz
+watch(() => messages.value, () => {
     scrollToBottom();
 }, {deep: true});
 </script>
@@ -60,7 +60,7 @@ watch(() => messages.value, () => {  // messages.value kullanarak reaktif değer
     <div class="bg-white shadow-sm w-full rounded-sm flex flex-col">
         <div class="flex justify-between shadow-sm p-2">
             <div class="font-bold">
-                Messages {{ message }}
+                Messages
             </div>
             <div>
                 <!-- Yenile Butonu -->
