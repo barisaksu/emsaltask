@@ -2,7 +2,10 @@
 
 namespace App\Observers;
 
+use App\Events\MessageSent;
 use App\Models\Message;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class MessageObserver
 {
@@ -16,7 +19,9 @@ class MessageObserver
      */
     public function created(Message $message): void
     {
-        //
+        Log::info('Message created: ' . $message->id);
+        broadcast(new MessageSent($message));
+        Log::info('MessageSent event broadcasted for message: ' . $message->id);
     }
 
     /**
