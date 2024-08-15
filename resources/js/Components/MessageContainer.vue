@@ -54,10 +54,6 @@ watch(() => message.value, (newValue) => {
 watch(() => messages.value, () => {  // messages.value kullanarak reaktif değeri izliyoruz
     scrollToBottom();
 }, {deep: true});
-
-onMounted(() => {
-    scrollToBottom();
-});
 </script>
 
 <template>
