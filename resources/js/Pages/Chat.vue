@@ -1,8 +1,61 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import {Head} from '@inertiajs/vue3';
+import axios from "axios";
+import {usePage} from '@inertiajs/vue3';
 import {ref, watch} from "vue";
 
+const {props} = usePage();
+const currentUserId = ref(props.auth.user.id);
+
+defineProps({
+    users: Object
+});
+
+const selectedUserId = ref(null);
+
+function selectUser(userId) {
+    selectedUserId.value = userId;
+    getMessages();
+}
+
+function sendMessage() {
+    if (!selectedUserId.value) {
+        console.error("No user selected");
+        return;
+    }
+
+    axios.post('/send-message', {
+        body: message.value,
+        receiver_id: selectedUserId.value,
+    }).then(response => {
+        message.value = '';
+        console.log(response.data);
+    }).catch(error => {
+        console.error(error);
+    });
+}
+
+function getMessages() {
+    console.log(currentUserId.value, selectedUserId.value);
+    if (!selectedUserId.value) {
+        console.error("No user selected");
+        return;
+    }
+
+    axios.get(`/get-messages`, {
+        params: {
+            receiver_id: selectedUserId.value
+        }
+    }).then(response => {
+        console.log(response.data);
+        messages.value = response.data;
+    }).catch(error => {
+        console.error(error);
+    });
+}
+
+const messages = ref([]);
 const message = ref('');
 const isSendDisabled = ref(true);
 
@@ -27,17 +80,10 @@ watch(message, (newValue) => {
                     </div>
 
                     <ul class="p-2">
-                        <li class="user-list active-chat">
-                            Barış Bideratan
-                        </li>
-                        <li class="user-list">
-                            İsa Öztaş
-                        </li>
-                        <li class="user-list">
-                            Haluk Ünal
-                        </li>
-                        <li class="user-list">
-                            Selin Poyraz
+                        <li v-for="user in users" :key="user.id" class="user-list"
+                            :class="{ 'active-chat': selectedUserId === user.id }"
+                            @click="selectUser(user.id)">
+                            {{ user.name }}
                         </li>
                     </ul>
 
@@ -48,57 +94,54 @@ watch(message, (newValue) => {
                             Messages
                         </div>
                         <div>
-                            <!--                        Yenile Butonu -->
+                            <!-- Yenile Butonu -->
                             <button class="border border-gray-100 px-2 rounded-sm">Refresh</button>
                         </div>
                     </div>
-                    <!-- Mesajların bulunduğu alan -->
-                    <div class="w-full flex-1 overflow-y-scroll">
-                        <!-- Sağda yer alacak mesajlar için -->
-                        <div class="flex justify-end">
-                            <div class="m-4 p-4 bg-blue-500 text-white w-1/2 rounded-lg">Lorem ipsum dolor sit amet
-                            </div>
-                        </div>
-                        <!-- Solda yer alacak mesajlar için -->
-                        <div class="flex justify-start">
-                            <div class="m-4 p-4 bg-gray-100 w-1/2 rounded-lg">Lorem ipsum dolor sit amet</div>
-                        </div>
-                        <div class="flex justify-end">
-                            <div class="m-4 p-4 bg-blue-500 text-white w-1/2 rounded-lg">Lorem ipsum dolor sit amet
-                            </div>
-                        </div>
-                        <div class="flex justify-end">
-                            <div class="m-4 p-4 bg-blue-500 text-white w-1/2 rounded-lg">Lorem ipsum dolor sit amet
-                            </div>
-                        </div>
-                        <div class="flex justify-end">
-                            <div class="m-4 p-4 bg-blue-500 text-white w-1/2 rounded-lg">Lorem ipsum dolor sit amet
-                            </div>
-                        </div>
-                        <div class="flex justify-end">
-                            <div class="m-4 p-4 bg-blue-500 text-white w-1/2 rounded-lg">Lorem ipsum dolor sit amet
-                            </div>
-                        </div>
-                        <div class="flex justify-end">
-                            <div class="m-4 p-4 bg-blue-500 text-white w-1/2 rounded-lg">Lorem ipsum dolor sit amet
-                            </div>
-                        </div>
+                    <div v-if="!selectedUserId" class="flex justify-center items-center my-auto">
+                        Please select a user to start chat!
                     </div>
-                    <!-- Mesaj yazma alanı -->
-                    <div class="flex space-x-2 m-4">
-                        <input type="text" v-model="message" class="w-full p-2 border border-gray-300 rounded-sm"
-                               placeholder="Type a message..."/>
-                        <!-- Gönder butonu -->
-                        <button :disabled="isSendDisabled"
-                                :class="['bg-blue-500 text-white p-2 rounded-sm',
-                 isSendDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600']">
-                            Send
-                        </button>
+                    <template v-else>
+                        <!-- Mesajların bulunduğu alan -->
+                        <div class="w-full flex-1 overflow-y-scroll">
+                            <div v-if="messages.length === 0"
+                                 class="flex justify-center items-center h-full my-auto text-gray-500">
+                                Say hi to start chat! 👋
+                            </div>
 
-                    </div>
+                            <div v-for="message in messages" :key="message.id"
+                                 class="m-4">
+                                <div
+                                    :class="message.user_id === currentUserId ? 'flex justify-end' : 'flex justify-start'">
+                                    <div
+                                        :class="message.user_id === currentUserId ? 'p-4 bg-blue-500 text-white w-1/2 rounded-lg' : 'p-4 bg-gray-100 w-1/2 rounded-lg'">
+                                        {{ message.body }}
+                                    </div>
+                                </div>
+                                <div
+                                    :class="message.user_id === currentUserId ? 'flex justify-end' : 'flex justify-start'">
+            <span class="text-xs text-gray-500 mt-1">
+                {{ message.sent_at }}
+            </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mesaj yazma alanı -->
+                        <div class="flex space-x-2 m-4">
+                            <input type="text" v-model="message" class="w-full p-2 border border-gray-300 rounded-sm"
+                                   placeholder="Type a message..."/>
+                            <!-- Gönder butonu -->
+                            <button :disabled="isSendDisabled"
+                                    :class="['bg-blue-500 text-white p-2 rounded-sm',
+                 isSendDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600']"
+                                    @click="sendMessage">
+                                Send
+                            </button>
+
+                        </div>
+                    </template>
                 </div>
-
-
             </div>
         </div>
     </AuthenticatedLayout>
