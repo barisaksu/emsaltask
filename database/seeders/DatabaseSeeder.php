@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -17,12 +18,16 @@ class DatabaseSeeder extends Seeder
 
         $users = [
             [
-                'name' => 'Barış Bideratan',
+                'name'  => 'Barış Bideratan',
                 'email' => 'baris@emsal.com.tr',
             ],
             [
-                'name' => 'İsa Öztaş',
+                'name'  => 'İsa Öztaş',
                 'email' => 'isa@emsal.com.tr',
+            ],
+            [
+                'name'  => 'Haluk Ünal',
+                'email' => 'haluk@emsal.com.tr',
             ],
         ];
 
