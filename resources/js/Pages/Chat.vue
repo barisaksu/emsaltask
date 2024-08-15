@@ -1,6 +1,14 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import {Head} from '@inertiajs/vue3';
+import {ref, watch} from "vue";
+
+const message = ref('');
+const isSendDisabled = ref(true);
+
+watch(message, (newValue) => {
+    isSendDisabled.value = newValue.length < 10;
+});
 </script>
 
 <template>
@@ -78,10 +86,15 @@ import {Head} from '@inertiajs/vue3';
                     </div>
                     <!-- Mesaj yazma alanı -->
                     <div class="flex space-x-2 m-4">
-                        <input type="text" class="w-full p-2 border border-gray-300 rounded-sm"
+                        <input type="text" v-model="message" class="w-full p-2 border border-gray-300 rounded-sm"
                                placeholder="Type a message..."/>
                         <!-- Gönder butonu -->
-                        <button class="bg-blue-500 text-white p-2 rounded-sm">Send</button>
+                        <button :disabled="isSendDisabled"
+                                :class="['bg-blue-500 text-white p-2 rounded-sm',
+                 isSendDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600']">
+                            Send
+                        </button>
+
                     </div>
                 </div>
 
