@@ -2,7 +2,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import {Head} from '@inertiajs/vue3';
 import {usePage} from '@inertiajs/vue3';
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import UserList from "@/Components/UserList.vue";
 import MessageContainer from "@/Components/MessageContainer.vue";
 
@@ -11,12 +11,20 @@ defineProps({
     users: Object,
 });
 
+const time = ref('');
 const currentUserId = ref(props.auth.user.id);
 const selectedUserId = ref(null);
 
 function selectUser(userId) {
     selectedUserId.value = userId;
 }
+
+onMounted(() => {
+    Echo.channel('time-messages')
+        .listen('TimeMessageSent', (e) => {
+            time.value = e.messageText;
+        });
+});
 </script>
 
 <template>
@@ -25,6 +33,9 @@ function selectUser(userId) {
     <AuthenticatedLayout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Chat</h2>
+            <span>
+                {{ time }}
+            </span>
         </template>
 
         <div class="py-12">
