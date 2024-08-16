@@ -4,7 +4,6 @@ namespace App\Observers;
 
 use App\Events\MessageSent;
 use App\Models\Message;
-use Illuminate\Support\Facades\Log;
 
 class MessageObserver
 {
