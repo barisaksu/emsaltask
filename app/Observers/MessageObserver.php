@@ -18,9 +18,7 @@ class MessageObserver
      */
     public function created(Message $message): void
     {
-        Log::info('Message created: ' . $message->id);
         broadcast(new MessageSent($message));
-        Log::info('MessageSent event broadcasted for message: ' . $message->id);
     }
 
     /**
