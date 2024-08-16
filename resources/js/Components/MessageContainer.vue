@@ -34,12 +34,15 @@ function sendMessage() {
 
 watch(() => props.selectedUserId, (newUserId) => {
     if (newUserId) {
+        // Leave previous channel
         Echo.leave(`chat.${props.currentUserId}`);
 
         Echo.private(`chat.${props.currentUserId}`)
             .listen('MessageSent', (e) => {
                 if (props.selectedUserId === e.message.user_id || props.selectedUserId === e.message.receiver_id) {
-                    messages.value.push(e.message);
+                    if (!messages.value.some(msg => msg.id === e.message.id)) {
+                        messages.value.push(e.message);
+                    }
                 }
             })
             .error((error) => {
@@ -77,7 +80,6 @@ watch(() => messages.value, () => {
             Please select a user to start chat!
         </div>
         <template v-else>
-            <!-- Mesajların bulunduğu alan -->
             <div ref="messagesContainer" class="w-full flex-1 overflow-y-scroll">
                 <div v-if="messages.length === 0"
                      class="flex justify-center items-center h-full my-auto text-gray-500">
@@ -102,11 +104,9 @@ watch(() => messages.value, () => {
                 </div>
             </div>
 
-            <!-- Mesaj yazma alanı -->
             <div class="flex space-x-2 m-4">
                 <input type="text" v-model="message" class="w-full p-2 border border-gray-300 rounded-sm"
                        placeholder="Type a message..."/>
-                <!-- Gönder butonu -->
                 <button :disabled="isSendDisabled"
                         :class="['bg-blue-500 text-white p-2 rounded-sm',
                  isSendDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600']"
