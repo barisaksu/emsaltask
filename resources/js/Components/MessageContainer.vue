@@ -36,7 +36,9 @@ watch(() => props.selectedUserId, (newUserId) => {
     if (newUserId) {
         Echo.private(`chat.${props.currentUserId}`)
             .listen('MessageSent', (e) => {
-                messages.value.push(e.message);
+                if (props.selectedUserId === e.message.user_id || props.selectedUserId === e.message.receiver_id) {
+                    messages.value.push(e.message);
+                }
             })
             .error((error) => {
                 console.error('Abonelik hatası:', error);
