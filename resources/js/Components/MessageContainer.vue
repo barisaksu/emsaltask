@@ -34,6 +34,8 @@ function sendMessage() {
 
 watch(() => props.selectedUserId, (newUserId) => {
     if (newUserId) {
+        Echo.leave(`chat.${props.currentUserId}`);
+
         Echo.private(`chat.${props.currentUserId}`)
             .listen('MessageSent', (e) => {
                 if (props.selectedUserId === e.message.user_id || props.selectedUserId === e.message.receiver_id) {
